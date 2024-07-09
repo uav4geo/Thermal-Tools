@@ -29,6 +29,18 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
 
 Unfortunately DJI does not provide binaries for macOS, so this application cannot work on macOS.
 
+## Build
+
+You'll need to install https://docs.flutter.dev/get-started/install, then:
+
+```bash
+flutter build windows
+```
+
+## Contributions
+
+We welcome contributions! Feel free to open pull requests.
+
 ## Licenses
 
  - This code, not including the DJI Thermal SDK and Exiftool is licensed under the AGPLv3
