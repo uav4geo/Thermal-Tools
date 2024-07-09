@@ -4,11 +4,31 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
 
 ![Thermal Tool](https://github.com/uav4geo/Thermal-Tools/assets/1951843/559c4738-72d6-4d59-aa31-9d881074a423)
 
+## Usage
 
+ * Download https://github.com/uav4geo/Thermal-Tools/releases/download/v1.0.0/Thermal_Tools_Setup.exe
+ * Select a folder with thermal images captured with a DJI drone
+ * Press "Process"
+
+## Supported Drones
+
+ * Zenmuse H20N
+ * Zenmuse H20 Series
+ * Matrice 30 Series
+ * Zenmuse XT S
+ * Zenmuse H30 Series
+ * Mavic 2 Enterprise Advanced
+ * DJI Mavic 3 Enterprise
+
+## Supported Platforms
+
+ * Windows 
+ * Linux (work in progress)
+
+Unfortunately DJI does not provide binaries for macOS, so this application cannot work on macOS.
 
 ## Licenses
 
  - This code, not including the DJI Thermal SDK and Exiftool is licensed under the AGPLv3
  - The DJI Thermal SDK binaries are proprietary. See https://www.dji.com/downloads/softwares/dji-thermal-sdk for licensing details.
  - ExifTool is licensed under the GPLv3
-
