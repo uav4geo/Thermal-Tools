@@ -13,7 +13,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{F3B80999-1DCF-49F0-9430-FBED2F2957E3}
+AppId={{DD5FE31F-2A80-4688-8D92-5073267E024C}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -54,3 +54,6 @@ Name: "{userdesktop}\Thermal Tools"; Filename: "{app}\thermal_tools.exe"; Workin
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+[Run]
+Filename: {app}\thermal_tools.exe; Description: "Launch Thermal Tools"; Flags: nowait postinstall skipifsilent

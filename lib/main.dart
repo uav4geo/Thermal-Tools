@@ -179,6 +179,13 @@ class _HomePageState extends State<HomePage> {
     await outDir.create();
 
     var q = Queue.from(_selectedFiles.toList());
+
+    // Process the first one synchronously to allow exiftool to self-extract without
+    // race conditions...
+    if (q.isNotEmpty){
+      await _convertFile(outDir, q.removeFirst());
+    }
+
     List<Future<void>> tasks = [];
 
     int workers = 0;
