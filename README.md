@@ -10,6 +10,8 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
  * Select a folder with thermal images captured with a DJI drone
  * Press "Process"
 
+:warning: When processing the resulting images with WebODM, make sure you **don't** select the *radiometric-calibration* option. The images processed with this software are already calibrated. 
+
 ## Supported Drones
 
  * Zenmuse H20N
