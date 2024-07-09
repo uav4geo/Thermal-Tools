@@ -21,12 +21,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DJI Thermal Tools',
+      title: 'Thermal Tools',
       theme: ThemeData(
         colorScheme: ColorScheme.highContrastLight(),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'DJI Thermal Tools by UAV4GEO'),
+      home: const HomePage(title: 'Thermal Tools by UAV4GEO'),
     );
   }
 }
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getExifToolPath(){
-    return p.join(getAssetsPath().path, "exiftool.exe");
+    return p.join(getAssetsPath().path, "windows", "exiftool.exe");
   }
 
   String getXmpConfigPath(){
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getDjiToolPath(){
-    return p.join(getAssetsPath().path, "dji_tools", "dji_irp.exe");
+    return p.join(getAssetsPath().path, "windows", "dji_tools", "dji_irp.exe");
   }
 
   Future<(String, int, int)> convertFileToRaw(String inFile, String outFile) async{
