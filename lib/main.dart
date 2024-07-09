@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:collection';
+import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -42,6 +44,7 @@ class _HomePageState extends State<HomePage> {
   String _selectedFolder = "";
   List<FileSystemEntity> _selectedFiles = [];
   bool _processing = false;
+  bool _canceled = false;
   int _processedFiles = 0;
   int _failedFiles = 0;
   String _lastError = "";
@@ -80,16 +83,33 @@ class _HomePageState extends State<HomePage> {
     return p.join(getAssetsPath().path, "dji_tools", "dji_irp.exe");
   }
 
-  Future<String> convertFileToRaw(String inFile, String outFile) async{
+  Future<(String, int, int)> convertFileToRaw(String inFile, String outFile) async{
     String outFileRaw = "$outFile.raw";
     final process = await Process.run(getDjiToolPath(), [
       "-a", "measure", "--measurefmt", "float32", "-s", inFile, "-o", "$outFile.raw"
     ]);
+
+    String out = process.stdout.toString();
     if (process.exitCode != 0){
-      throw process.stdout.toString();
+      throw out;
     }
 
-    return outFileRaw;
+    int width = 640;
+    int height = 512;
+
+    RegExp regExp = RegExp(r'width\s*:\s*(\d+)');
+    RegExpMatch? match = regExp.firstMatch(out);
+    if (match != null){
+      width = int.parse(match.group(1)!);
+    }
+
+    regExp = RegExp(r'height\s*:\s*(\d+)');
+    match = regExp.firstMatch(out);
+    if (match != null){
+      height = int.parse(match.group(1)!);
+    }
+
+    return (outFileRaw, width, height);
   }
 
   Future<void> copyExifTags(String exifFile, String targetFile) async{
@@ -101,14 +121,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> convertRawToTiff(String exifFile, String rawFile, String outFile) async{
+  Future<void> convertRawToTiff(String exifFile, String rawFile, int width, int height, String outFile) async{
     // final exifImg = im.decodeImage(await File(exifFile).readAsBytes())!;
     final rawBytes = await File(rawFile).readAsBytes();
     
-    // TODO: read image width/height from output
-    const int width = 640;
-    const int height = 512;
-
     final img = im.Image(width: width, height: height, format: im.Format.float32, numChannels: 1, withPalette: false);//, exif: exifImg.exif);
     final inData = Float32List.view(rawBytes.buffer, 0, width * height);
     final outData = Float32List.view(img.data!.buffer, 0, width * height);
@@ -122,9 +138,35 @@ class _HomePageState extends State<HomePage> {
     await File(outFile).writeAsBytes(outBytes, flush: true);
   }
 
+  Future<void> _convertFile(Directory outDir, FileSystemEntity f) async{
+    String outFile = p.join(outDir.path, "${p.basenameWithoutExtension(f.path)}.tif");
+    if (_processing){
+      String outFileRaw = "";
+      int width = 640;
+      int height = 512;
+      try{
+        (outFileRaw, width, height) = await convertFileToRaw(f.path, outFile);
+        await convertRawToTiff(f.path, outFileRaw, width, height, outFile);
+        await copyExifTags(f.path, outFile);
+      }catch(e){
+        setState((){ 
+          _failedFiles++; 
+          _lastError = e.toString();
+        });
+      }finally{
+        if (outFileRaw != ""){
+          File f = File(outFileRaw);
+          if (await f.exists()) await f.delete();
+        }
+      }
+      setState((){ _processedFiles++; });
+    }
+  }
+
   Future<void> _convertFiles(BuildContext context) async{
     setState((){
       _processing = true;
+      _canceled = false;
       _processedFiles = 0;
       _failedFiles = 0;
       _lastError = "";
@@ -136,34 +178,22 @@ class _HomePageState extends State<HomePage> {
     }
     await outDir.create();
 
-    for (FileSystemEntity f in _selectedFiles){
-      String outFile = p.join(outDir.path, "${p.basenameWithoutExtension(f.path)}.tif");
+    var q = Queue.from(_selectedFiles.toList());
+    List<Future<void>> tasks = [];
 
-      if (_processing){
-        String outFileRaw = "";
-        try{
-          outFileRaw = await convertFileToRaw(f.path, outFile);
-          await convertRawToTiff(f.path, outFileRaw, outFile);
-          await copyExifTags(f.path, outFile);
-        }catch(e){
-          print(e);
-          setState((){ 
-            _failedFiles++; 
-            _lastError = e.toString();
-          });
-        }finally{
-          if (outFileRaw != ""){
-            File f = File(outFileRaw);
-            if (await f.exists()) await f.delete();
-          }
-        }
+    int workers = 0;
+    while(q.isNotEmpty && !_canceled){
+      tasks.add(_convertFile(outDir, q.removeFirst()).then((_){ workers--; }).catchError((_){ workers--; }));
+      workers++;
+      while (workers >= Platform.numberOfProcessors) {
+        await Future.delayed(const Duration(milliseconds: 200));
       }
-
-      setState((){ _processedFiles++; });
     }
 
+    await Future.wait(tasks);
+
     if (_failedFiles > 0){
-      _lastError = "${_processedFiles} files failed to convert: ${_lastError}";
+      _lastError = "$_processedFiles files failed to convert: $_lastError";
     }
 
     setState((){
@@ -175,6 +205,7 @@ class _HomePageState extends State<HomePage> {
     setState((){
       _processing = false;
       _processedFiles = 0;
+      _canceled = true;
     });
   }
 
@@ -189,7 +220,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> controls;
-    final finished = _selectedFolder != "" && !_processing && _processedFiles > 0;
+    final finished = !_canceled && _selectedFolder != "" && !_processing && _processedFiles > 0;
 
     if (_processing){
       controls = <Widget>[Container(
