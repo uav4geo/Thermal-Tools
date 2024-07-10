@@ -2,8 +2,7 @@
 
 A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [WebODM](https://webodm.net).
 
-![Thermal Tool](https://github.com/uav4geo/Thermal-Tools/assets/1951843/68729a50-2ae7-452b-84ef-c4c2cc51a48d)
-
+![Thermal Tool](https://github.com/uav4geo/Thermal-Tools/assets/1951843/41edbc20-d779-45c3-b513-db8fdcbb5c7a)
 
 ## Usage
 
