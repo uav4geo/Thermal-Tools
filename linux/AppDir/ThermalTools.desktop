@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=bundle/thermal_tools %u
+Type=Application
+Categories=Graphics
+Icon=ThermalTools
+Name=ThermalTools.desktop

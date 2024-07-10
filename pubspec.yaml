@@ -68,10 +68,23 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/icon48.ico
     - assets/exiftool-LICENSE.txt
     - assets/xmp.config
     - assets/windows/dji_tools/
     - assets/windows/exiftool.exe
+    - assets/linux/dji_tools/
+    - assets/linux/exiftool/
+    - assets/linux/exiftool/lib/
+    - assets/linux/exiftool/lib/File/
+    - assets/linux/exiftool/lib/Image/
+    - assets/linux/exiftool/lib/Image/ExifTool/
+    - assets/linux/exiftool/lib/Image/ExifTool/Charset/
+    - assets/linux/exiftool/lib/Image/ExifTool/Lang/
+    - assets/linux/exiftool/lib/x86_64-linux-thread-multi/
+    - assets/linux/exiftool/lib/x86_64-linux-thread-multi/auto/
+    - assets/linux/exiftool/lib/x86_64-linux-thread-multi/auto/Image/
+    - assets/linux/exiftool/lib/x86_64-linux-thread-multi/auto/Image/ExifTool/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

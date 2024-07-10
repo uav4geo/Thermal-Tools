@@ -40,14 +40,15 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "thermal_tools");
+    gtk_header_bar_set_title(header_bar, "Thermal Tools by UAV4GEO - 1.0.0");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "thermal_tools");
+    gtk_window_set_title(window, "Thermal Tools by UAV4GEO - 1.0.0");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+  gtk_window_set_default_size(window, 480, 320);
+  gtk_window_set_icon_from_file(GTK_WINDOW(window), "data/flutter_assets/assets/icon48.ico", NULL);
   gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();

@@ -1,0 +1,22 @@
+=head2 Wed Jul 10 02:31:41 2024: C<Module> L<Image::ExifTool|Image::ExifTool>
+
+=over 4
+
+=item *
+
+C<installed into: /home/piero/Downloads/exiftool/bin/lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 12.87>
+
+=item *
+
+C<EXE_FILES: exiftool>
+
+=back
+

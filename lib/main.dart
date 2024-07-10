@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:collection';
-import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -72,7 +71,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getExifToolPath(){
-    return p.join(getAssetsPath().path, "windows", "exiftool.exe");
+    if (Platform.isLinux){
+      return p.join(getAssetsPath().path, "linux", "exiftool", "exiftool");
+    }else{
+      return p.join(getAssetsPath().path, "windows", "exiftool.exe");
+    }
   }
 
   String getXmpConfigPath(){
@@ -80,7 +83,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getDjiToolPath(){
-    return p.join(getAssetsPath().path, "windows", "dji_tools", "dji_irp.exe");
+    if (Platform.isLinux){
+      return p.join(getAssetsPath().path, "linux", "dji_tools", "dji_irp.sh");
+    }else{
+      // Windows
+      return p.join(getAssetsPath().path, "windows", "dji_tools", "dji_irp.exe");
+    }
   }
 
   Future<(String, int, int)> convertFileToRaw(String inFile, String outFile) async{
@@ -89,7 +97,7 @@ class _HomePageState extends State<HomePage> {
       "-a", "measure", "--measurefmt", "float32", "-s", inFile, "-o", "$outFile.raw"
     ]);
 
-    String out = process.stdout.toString();
+    String out = "${process.stdout.toString()}\n${process.stderr.toString()}";
     if (process.exitCode != 0){
       throw out;
     }
@@ -171,6 +179,12 @@ class _HomePageState extends State<HomePage> {
       _failedFiles = 0;
       _lastError = "";
     });
+
+    // Make sure executables are executable
+    if (Platform.isLinux){
+      Process.run("chmod", ["+x", getDjiToolPath()]);
+      Process.run("chmod", ["+x", getExifToolPath()]);
+    }
 
     Directory outDir = Directory(getOutputFolder());
     if (await outDir.exists()){
