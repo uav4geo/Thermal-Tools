@@ -43,7 +43,7 @@ Name: "{app}\resources\app\apps"; Permissions: users-full
 Name: "{app}\resources\app\logs"; Permissions: users-full
 
 [Files]
-Source: "D:\thermal_tools\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: users-full
+Source: "build\windows\x64\runner\Release\*"; Excludes: "data\flutter_assets\assets\linux\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: users-full
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}"
