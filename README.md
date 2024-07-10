@@ -6,7 +6,17 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
 
 ## Usage
 
- * Download https://github.com/uav4geo/Thermal-Tools/releases/download/v1.0.0/Thermal_Tools_Setup.exe
+### Windows
+
+ * Download and install https://github.com/uav4geo/Thermal-Tools/releases/download/v1.0.0/Thermal_Tools_Setup.exe
+
+### Linux
+
+ * Download https://github.com/uav4geo/Thermal-Tools/releases/download/v1.0.0/Thermal_Tools.AppImage
+ * Run: `chmod +x ./Thermal_Tools.AppImage && ./Thermal_Tools.AppImage`
+
+Afterwards:
+
  * Select a folder with thermal images captured with a DJI drone
  * Press "Process"
 
@@ -25,7 +35,7 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
 ## Supported Platforms
 
  * Windows 
- * Linux (work in progress)
+ * Linux
 
 Unfortunately DJI does not provide binaries for macOS, so this application cannot work on macOS.
 
@@ -35,6 +45,12 @@ You'll need to install https://docs.flutter.dev/get-started/install, then:
 
 ```bash
 flutter build windows
+```
+
+Or
+
+```bash
+flutter build linux
 ```
 
 ## Contributions
