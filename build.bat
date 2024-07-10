@@ -6,7 +6,7 @@ cd %ROOT_DIR%
 set SIGNTOOL_PATH=C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\SignTool.exe
 set CODESIGNCERT_PATH=D:\comodo.pfx
 
-
+call flutter clean
 call flutter build windows
 
 echo Signing...
