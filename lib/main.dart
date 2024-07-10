@@ -8,6 +8,8 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image/image.dart' as im;
 import 'tiff_encoder.dart';
+import 'input_slider/input_slider.dart';
+import 'input_slider/input_slider_form.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,6 +49,13 @@ class _HomePageState extends State<HomePage> {
   int _processedFiles = 0;
   int _failedFiles = 0;
   String _lastError = "";
+  bool _overrideEnvParams = false;
+  double _paramDistance = 5.0; // meters
+  double _paramHumidity = 70.0; // %
+  double _paramEmissivity = 1.0; // factor
+  double _paramAmbient = 25.0; // Celsius
+  double _paramReflection = 23.0; // Celsius
+
 
   Future<void> _selectFolder(BuildContext context) async{
     String? path = await FilePicker.platform.getDirectoryPath(dialogTitle: "Select Images Folder");
@@ -93,9 +102,19 @@ class _HomePageState extends State<HomePage> {
 
   Future<(String, int, int)> convertFileToRaw(String inFile, String outFile) async{
     String outFileRaw = "$outFile.raw";
-    final process = await Process.run(getDjiToolPath(), [
+    List<String> params = [
       "-a", "measure", "--measurefmt", "float32", "-s", inFile, "-o", "$outFile.raw"
-    ]);
+    ];
+    if (_overrideEnvParams){
+      params += [
+        "--distance", _paramDistance.toString(),
+        "--humidity", _paramHumidity.toString(),
+        "--emissivity", _paramEmissivity.toString(),
+        "--ambient", _paramAmbient.toString(),
+        "--reflection", _paramReflection.toString(),
+      ];
+    }
+    final process = await Process.run(getDjiToolPath(), params);
 
     String out = "${process.stdout.toString()}\n${process.stderr.toString()}";
     if (process.exitCode != 0){
@@ -232,6 +251,109 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<String?> _showEnvironmentalParams(BuildContext context){
+    return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => 
+        StatefulBuilder(builder: (BuildContext context, setState) => 
+          Dialog.fullscreen(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(margin: const EdgeInsets.only(top: 16, bottom: 16),
+                child: Column(mainAxisSize: MainAxisSize.max, children: [SwitchListTile(
+                  title: const Text('Override Defaults'),
+                  value: _overrideEnvParams,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _overrideEnvParams = value;
+                    });
+                  }
+                ),
+                const SizedBox(height: 16),
+                _overrideEnvParams ? Container(margin: const EdgeInsets.only(left: 16, right: 16), 
+                  child: InputSliderForm(
+                    leadingWeight: 18,
+                    sliderWeight: 20,
+                    filled: true,
+                    vertical: false,
+                    children: [
+                      InputSlider(
+                        onChange: (value) {
+                          setState((){
+                            _paramDistance = value;
+                          });
+                        },
+                        min: 1.0,
+                        max: 25.0,
+                        decimalPlaces: 0,
+                        defaultValue: _paramDistance,
+                        leading: const Text("Distance (m):"),
+                      ),
+                      InputSlider(
+                        onChange: (value) {
+                          setState((){
+                            _paramHumidity = value;
+                          });
+                        },
+                        min: 20.0,
+                        max: 100.0,
+                        decimalPlaces: 0,
+                        defaultValue: _paramHumidity,
+                        leading: const Text("Humidity (%):"),
+                      ),
+                      InputSlider(
+                        onChange: (value) {
+                          setState((){
+                            _paramEmissivity = value;
+                          });
+                        },
+                        min: 0.10,
+                        max: 1.00,
+                        decimalPlaces: 2,
+                        defaultValue: _paramEmissivity,
+                        leading: const Text("Emissivity:"),
+                      ),
+                      InputSlider(
+                        onChange: (value) {
+                          setState((){
+                            _paramAmbient = value;
+                          });
+                        },
+                        min: -40.0,
+                        max: 80.0,
+                        decimalPlaces: 1,
+                        defaultValue: _paramAmbient,
+                        leading: const Text("Ambient Temperature (°C):"),
+                      ),
+                      InputSlider(
+                        onChange: (value) {
+                          setState((){
+                            _paramReflection = value;
+                          });
+                        },
+                        min: -40.0,
+                        max: 500.0,
+                        decimalPlaces: 1,
+                        defaultValue: _paramReflection,
+                        leading: const Text("Reflected Temperature (°C):"),
+                      )
+                    ])) : Container(),
+                  const SizedBox(height: 16),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Save'),
+                  ),
+                ])),
+              ],
+            ),
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> controls;
@@ -253,7 +375,7 @@ class _HomePageState extends State<HomePage> {
         ),
         OutlinedButton(
           onPressed: () => _cancelProcessing(context),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         )];
     }else if (finished){
       controls = <Widget>[
@@ -273,10 +395,18 @@ class _HomePageState extends State<HomePage> {
         ),
       ];
     }else{
-      var button = _selectedFolder != "" ? OutlinedButton(
+      var button = _selectedFolder != "" ? Column(children: [
+        Container(margin: const EdgeInsets.only(bottom: 16.0),
+          child: OutlinedButton(
+            
+            child: const Text('Set Environment Params'),
+            onPressed: () => _showEnvironmentalParams(context),
+        )),
+        FilledButton(
           onPressed: _selectedFiles.isEmpty ? null : () => _convertFiles(context),
           child: Text('Process ${_selectedFiles.length} Files'),
-        ) : Container();
+        )
+      ]) : Container();
       
       controls = <Widget>[
         Container(
