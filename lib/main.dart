@@ -180,12 +180,6 @@ class _HomePageState extends State<HomePage> {
       _lastError = "";
     });
 
-    // Make sure executables are executable
-    if (Platform.isLinux){
-      Process.run("chmod", ["+x", getDjiToolPath()]);
-      Process.run("chmod", ["+x", getExifToolPath()]);
-    }
-
     Directory outDir = Directory(getOutputFolder());
     if (await outDir.exists()){
       await outDir.delete(recursive: true);

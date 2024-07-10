@@ -1,1 +1,6 @@
-bundle/thermal_tools
+#!/bin/bash
+
+__dirname=$(cd "$(dirname "$0")"; pwd -P)
+cd "${__dirname}/bundle"
+
+./thermal_tools "$@"
