@@ -43,6 +43,8 @@ dependencies:
   url_launcher: ^6.3.0
   image: ^4.2.0
   path: ^1.9.0
+  desktop_drop: ^0.4.4
+  flutter_riverpod: ^2.5.1
 
 platforms:
   windows:
