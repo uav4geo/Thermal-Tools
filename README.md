@@ -53,6 +53,19 @@ Or
 ```bash
 flutter build linux
 ```
+## Development
+
+Install [FVM](https://fvm.app/) and run:
+
+```bash
+fvm flutter pub get
+```
+
+You can run the application in development mode by running:
+
+```bash
+fvm flutter run
+```
 
 ## Contributions
 

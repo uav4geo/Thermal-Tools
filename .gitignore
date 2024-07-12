@@ -45,3 +45,6 @@ app.*.map.json
 /dist
 /installtools/appimagetool
 .vscode
+
+# FVM Version Cache
+.fvm/
