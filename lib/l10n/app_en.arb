@@ -1,3 +1,8 @@
 {
-  "selectImageFolder": "Select Images Folder"
+  "selectImageFolder": "Select Images Folder",
+  "dragAndDrop": "Drag and drop the folder here",
+  "clickToSelect": "Or click here to select files",
+  "dropHere": "Drop here",
+  "fileIsNotFolder": "Dragged file is not a folder",
+  "selected": "Selected folder"
 }

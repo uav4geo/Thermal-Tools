@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 
 /// Calculates the size of [text] in the [TextStyle] [style].

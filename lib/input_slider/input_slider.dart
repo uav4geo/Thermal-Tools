@@ -1,8 +1,6 @@
 library input_slider;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'util.dart';
 
 /// An input widget that combines a [Slider] synchronized with a [TextField]
@@ -103,7 +101,8 @@ class InputSlider extends StatefulWidget {
   final bool vertical;
 
   const InputSlider(
-      {required this.onChange,
+      {super.key,
+      required this.onChange,
       required this.min,
       required this.max,
       required this.defaultValue,
@@ -124,8 +123,7 @@ class InputSlider extends StatefulWidget {
       this.leadingWeight,
       this.sliderWeight,
       this.textFieldSize,
-      this.vertical = false})
-      : super();
+      this.vertical = false});
 
   @override
   _InputSliderState createState() => _InputSliderState(
@@ -162,10 +160,8 @@ class _InputSliderState extends State<InputSlider> {
       Flexible(
           flex: widget.leadingWeight ?? 0,
           fit: FlexFit.tight,
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: widget.leading)),
-      Padding(
+          child: Align(alignment: Alignment.centerLeft, child: widget.leading)),
+      const Padding(
         padding: EdgeInsets.only(left: 8.0),
       ),
       Padding(
@@ -173,101 +169,110 @@ class _InputSliderState extends State<InputSlider> {
         child: SizedBox(
           width: textFieldSize!.width,
           height: textFieldSize!.height,
-          child: Focus(child: TextField(
-            controller: _controller,
-            keyboardType: TextInputType.numberWithOptions(signed: true, decimal: true),
-            style: widget.textFieldStyle ?? DefaultTextStyle.of(context).style,
-            onSubmitted: (value) {
-              double parsedValue = double.tryParse(value) ?? this.defaultValue;
-              parsedValue = parsedValue.clamp(widget.min, widget.max);
-              setState(() {
-                this.defaultValue = parsedValue;
-              });
-              _setControllerValue(this.defaultValue);
-              widget.onChangeEnd?.call(this.defaultValue);
-            },
-            onChanged: (value){
-              double? parsedValue = double.tryParse(value);
-              if (parsedValue != null && parsedValue >= widget.min && parsedValue <= widget.max){
-                setState(() {
-                  this.defaultValue = parsedValue;
-                });
-                _setControllerValue(this.defaultValue);
-              }
-            },
-            textAlign: TextAlign.center,
-            decoration: widget.inputDecoration ??
-                InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius:
-                          widget.borderRadius ?? BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                          color: widget.borderColor ??
-                              Theme.of(context).hintColor)),
-                  border: OutlineInputBorder(
-                      borderRadius:
-                          widget.borderRadius ?? BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                          color: widget.borderColor ??
-                              Theme.of(context).hintColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius:
-                          widget.borderRadius ?? BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                          width: 2,
-                          color: widget.focusBorderColor ??
-                              Theme.of(context).primaryColor)),
-                  filled: widget.filled,
-                  fillColor: widget.fillColor,
-                  contentPadding: EdgeInsets.only(top: 5),
+          child: Focus(
+              child: TextField(
+                controller: _controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                    signed: true, decimal: true),
+                style:
+                    widget.textFieldStyle ?? DefaultTextStyle.of(context).style,
+                onSubmitted: (value) {
+                  double parsedValue =
+                      double.tryParse(value) ?? this.defaultValue;
+                  parsedValue = parsedValue.clamp(widget.min, widget.max);
+                  setState(() {
+                    this.defaultValue = parsedValue;
+                  });
+                  _setControllerValue(this.defaultValue);
+                  widget.onChangeEnd?.call(this.defaultValue);
+                },
+                onChanged: (value) {
+                  double? parsedValue = double.tryParse(value);
+                  if (parsedValue != null &&
+                      parsedValue >= widget.min &&
+                      parsedValue <= widget.max) {
+                    setState(() {
+                      this.defaultValue = parsedValue;
+                    });
+                    _setControllerValue(this.defaultValue);
+                  }
+                },
+                textAlign: TextAlign.center,
+                decoration: widget.inputDecoration ??
+                    InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius:
+                              widget.borderRadius ?? BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              color: widget.borderColor ??
+                                  Theme.of(context).hintColor)),
+                      border: OutlineInputBorder(
+                          borderRadius:
+                              widget.borderRadius ?? BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              color: widget.borderColor ??
+                                  Theme.of(context).hintColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius:
+                              widget.borderRadius ?? BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              width: 2,
+                              color: widget.focusBorderColor ??
+                                  Theme.of(context).primaryColor)),
+                      filled: widget.filled,
+                      fillColor: widget.fillColor,
+                      contentPadding: EdgeInsets.only(top: 5),
+                    ),
+              ),
+              onFocusChange: (hasFocus) {
+                if (!hasFocus) {
+                  this._setControllerValue(this.defaultValue);
+                }
+              }),
+        ),
+      ),
+      widget.vertical
+          ? Flexible(
+              flex: widget.sliderWeight ?? 1,
+              fit: FlexFit.tight,
+              child: RotatedBox(
+                quarterTurns: 1,
+                child: Slider(
+                  value: defaultValue,
+                  min: widget.min,
+                  max: widget.max,
+                  divisions: widget.division,
+                  activeColor: widget.activeSliderColor,
+                  inactiveColor: widget.inactiveSliderColor,
+                  onChangeEnd: widget.onChangeEnd,
+                  onChanged: (double value) {
+                    setState(() {
+                      this.defaultValue = value;
+                    });
+                    _setControllerValue(value);
+                  },
                 ),
-          ), onFocusChange: (hasFocus){
-            if (!hasFocus){
-              this._setControllerValue(this.defaultValue);
-            }
-          }),
-        ),
-      ),
-      widget.vertical ? Flexible(
-          flex: widget.sliderWeight ?? 1,
-          fit: FlexFit.tight,
-          child: RotatedBox(
-            quarterTurns: 1,
-            child: Slider(
-            value: defaultValue,
-            min: widget.min,
-            max: widget.max,
-            divisions: widget.division,
-            activeColor: widget.activeSliderColor,
-            inactiveColor: widget.inactiveSliderColor,
-            onChangeEnd: widget.onChangeEnd,
-            onChanged: (double value) {
-              setState(() {
-                this.defaultValue = value;
-              });
-              _setControllerValue(value);
-            },
-          ),
-        ),
-      ) : Flexible(
-        flex: widget.sliderWeight ?? 1,
-        fit: FlexFit.tight,
-        child: Slider(
-          value: defaultValue,
-          min: widget.min,
-          max: widget.max,
-          divisions: widget.division,
-          activeColor: widget.activeSliderColor,
-          inactiveColor: widget.inactiveSliderColor,
-          onChangeEnd: widget.onChangeEnd,
-          onChanged: (double value) {
-            setState(() {
-              this.defaultValue = value;
-            });
-            _setControllerValue(value);
-          },
-        ),
-      ),
+              ),
+            )
+          : Flexible(
+              flex: widget.sliderWeight ?? 1,
+              fit: FlexFit.tight,
+              child: Slider(
+                value: defaultValue,
+                min: widget.min,
+                max: widget.max,
+                divisions: widget.division,
+                activeColor: widget.activeSliderColor,
+                inactiveColor: widget.inactiveSliderColor,
+                onChangeEnd: widget.onChangeEnd,
+                onChanged: (double value) {
+                  setState(() {
+                    this.defaultValue = value;
+                  });
+                  _setControllerValue(value);
+                },
+              ),
+            ),
     ];
 
     return (widget.vertical)

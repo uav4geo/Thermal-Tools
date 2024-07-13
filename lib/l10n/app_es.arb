@@ -1,3 +1,8 @@
 {
-    "selectImageFolder": "Selecciona la carpeta de imágenes"
+    "selectImageFolder": "Selecciona la carpeta de imágenes",
+    "dragAndDrop": "Arrastra y suelta la carpeta de imágenes aquí",
+    "clickToSelect": "O haz clic aquí para seleccionar archivos",
+    "dropHere": "Suelta aquí",
+    "fileIsNotFolder": "El archivo arrastrado no es una carpeta",
+    "selected": "Carpeta seleccionada"
 }
