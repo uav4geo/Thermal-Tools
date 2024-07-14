@@ -4,5 +4,12 @@
     "clickToSelect": "O haz clic aquí para seleccionar archivos",
     "dropHere": "Suelta aquí",
     "fileIsNotFolder": "El archivo arrastrado no es una carpeta",
-    "selected": "Carpeta seleccionada"
+    "selected": "Carpeta seleccionada",
+    "processWith": "Procesar estas imágenes con ",
+    "folderNotSelected": "Carpeta no seleccionada",
+    "distance": "Distancia (m):",
+    "humidity": "Humedad (%):",
+    "emissivity": "Emisividad:",
+    "ambientTemperature": "Temperatura Ambiente (°C):",
+    "reflectedTemperature": "Temperatura Reflejada (°C):"
 }

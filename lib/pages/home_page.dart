@@ -1,6 +1,9 @@
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:dji_thermal_tools/provider/environment_provider.dart';
+import 'package:dji_thermal_tools/utils.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:dji_thermal_tools/constants.dart';
 import 'package:dji_thermal_tools/process.dart';
 import 'package:dji_thermal_tools/provider/path_model.dart';
@@ -11,9 +14,11 @@ import 'package:dji_thermal_tools/themes.dart';
 import 'package:dji_thermal_tools/widget/environment_widget.dart';
 import 'package:dji_thermal_tools/widget/image_folder_widget.dart';
 import 'package:dji_thermal_tools/widget/process_information_widget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends ConsumerWidget {
   const Home({super.key});
@@ -60,6 +65,33 @@ class Home extends ConsumerWidget {
             ? const CircularProgressIndicator()
             : const Icon(Icons.play_arrow),
       ),
+      bottomSheet: !ref.watch(processInformationProvider).finished
+          ? null
+          : Container(
+              margin: const EdgeInsets.only(bottom: 4.0),
+              child: RichText(
+                  text: TextSpan(
+                      style: const TextStyle(color: Colors.black, fontSize: 15),
+                      children: [
+                    TextSpan(text: AppLocalizations.of(context)!.processWith),
+                    TextSpan(
+                      text: "webodm.net",
+                      style: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 15,
+                          decoration: TextDecoration.underline),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          final url = Uri.https('webodm.net');
+
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                    ),
+                  ]))),
       body: LayoutBuilder(builder: (context, constraints) {
         if (constraints.maxWidth > maxResponsiveWidth) {
           return const Column(
@@ -69,7 +101,7 @@ class Home extends ConsumerWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 1,
                       child: ImageFolderWidget(),
                     ),
                     Expanded(
@@ -105,8 +137,10 @@ class Home extends ConsumerWidget {
     return Directory(p.join(exePath.path, "data", "flutter_assets", "assets"));
   }
 
-  String getOutputFolder(selectedFolder) {
-    if (selectedFolder == "") throw "Folder not selected";
+  String getOutputFolder(selectedFolder, context) {
+    if (selectedFolder == "") {
+      throw AppLocalizations.of(context)!.folderNotSelected;
+    }
     return p.join(selectedFolder, "converted");
   }
 
@@ -114,22 +148,26 @@ class Home extends ConsumerWidget {
       Directory outDir, FileSystemEntity f, WidgetRef ref) async {
     String outFile =
         p.join(outDir.path, "${p.basenameWithoutExtension(f.path)}.tif");
-    //if (_processing) {
-    String outFileRaw = "";
-    int width = 640;
-    int height = 512;
-    try {
-      ref.read(processModel).addProcess("Converting ${f.path}");
+    if (ref.watch(processInformationProvider).processing) {
+      String outFileRaw = "";
+      int width = 640;
+      int height = 512;
+      try {
+        ref.read(processModel).addProcess("Converting ${f.path}");
 
-      (outFileRaw, width, height) = await convertFileToRaw(f.path, outFile);
-      await convertRawToTiff(f.path, outFileRaw, width, height, outFile);
-      await copyExifTags(f.path, outFile);
-    } catch (e) {
-      ref.read(processModel).addProcess("Error converting ${f.path}: $e");
-    } finally {
-      if (outFileRaw != "") {
-        File f = File(outFileRaw);
-        if (await f.exists()) await f.delete();
+        EnvParams? envParams = ref.watch(environmentModel).envParams;
+
+        (outFileRaw, width, height) =
+            await convertFileToRaw(f.path, outFile, envParams);
+        await convertRawToTiff(f.path, outFileRaw, width, height, outFile);
+        await copyExifTags(f.path, outFile);
+      } catch (e) {
+        ref.read(processModel).addProcess("Error converting ${f.path}: $e");
+      } finally {
+        if (outFileRaw != "") {
+          File f = File(outFileRaw);
+          if (await f.exists()) await f.delete();
+        }
       }
     }
   }
@@ -138,7 +176,7 @@ class Home extends ConsumerWidget {
     ref.read(processInformationProvider).setProcessing(true);
     String selectedPath = ref.read(imagePathModel).path;
 
-    Directory outDir = Directory(getOutputFolder(selectedPath));
+    Directory outDir = Directory(getOutputFolder(selectedPath, context));
     if (await outDir.exists()) {
       await outDir.delete(recursive: true);
     }
@@ -156,13 +194,13 @@ class Home extends ConsumerWidget {
     if (q.isNotEmpty) {
       await _convertFile(outDir, q.removeFirst(), ref);
     }
-/*
-   
+
     List<Future<void>> tasks = [];
 
     int workers = 0;
-    while (q.isNotEmpty && !_canceled) {
-      tasks.add(_convertFile(outDir, q.removeFirst()).then((_) {
+
+    while (q.isNotEmpty && ref.watch(processInformationProvider).canceled) {
+      tasks.add(_convertFile(outDir, q.removeFirst(), ref).then((_) {
         workers--;
       }).catchError((_) {
         workers--;
@@ -175,11 +213,8 @@ class Home extends ConsumerWidget {
 
     await Future.wait(tasks);
 
-    if (_failedFiles > 0) {
-      _lastError = "$_processedFiles files failed to convert: $_lastError";
-    }
-*/
+    await saveLog(selectedPath, ref.watch(processModel).processes.join("\n"));
+
     ref.read(processInformationProvider).setProcessing(false);
-    // }
   }
 }
