@@ -4,5 +4,12 @@
   "clickToSelect": "Or click here to select files",
   "dropHere": "Drop here",
   "fileIsNotFolder": "Dragged file is not a folder",
-  "selected": "Selected folder"
+  "selected": "Selected folder",
+  "processWith": "Process these images with ",
+  "folderNotSelected": "Folder not selected",
+  "distance": "Distance (m):",
+  "humidity": "Humidity (%):",
+  "emissivity": "Emissivity:",
+  "ambientTemperature": "Ambient Temperature (°C):",
+  "reflectedTemperature": "Reflected Temperature (°C):"
 }

@@ -5,7 +5,7 @@ import 'package:path/path.dart' as p;
 import 'dart:typed_data';
 
 Future<(String, int, int)> convertFileToRaw(String inFile, String outFile,
-    {EnvParams? envParams}) async {
+    EnvParams? envParams) async {
   String outFileRaw = "$outFile.raw";
   List<String> params = [
     "-a",
@@ -126,12 +126,16 @@ String getOutputFolder(String selectedPath) {
 }
 
 class EnvParams {
-  double distance;
-  double humidity;
-  double emissivity;
-  double ambient;
-  double reflection;
+  double distance = 1.0;
+  double humidity = 50.0;
+  double emissivity = 0.95;
+  double ambient = 20.0;
+  double reflection = 20.0;
 
-  EnvParams(this.distance, this.humidity, this.emissivity, this.ambient,
-      this.reflection);
+  EnvParams(
+      {required this.distance,
+      required this.humidity,
+      required this.emissivity,
+      required this.ambient,
+      required this.reflection});
 }
