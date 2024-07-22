@@ -39,6 +39,8 @@ dependencies:
   file_picker: ^8.0.6
   url_launcher: ^6.3.0
   image: ^4.2.0
+  desktop_drop: ^0.4.4
+  
 
 platforms:
   windows:
