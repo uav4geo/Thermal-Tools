@@ -8,11 +8,11 @@ A tool to convert DJI thermal images to plain 32bit float TIFFs for use with [We
 
 ### Windows
 
- * Download and install https://github.com/uav4geo/Thermal-Tools/releases/download/v1.1.0/Thermal_Tools_Setup.exe
+ * Download and install https://github.com/uav4geo/Thermal-Tools/releases/download/v1.2.0/Thermal_Tools_Setup.exe
 
 ### Linux
 
- * Download https://github.com/uav4geo/Thermal-Tools/releases/download/v1.1.0/Thermal_Tools.AppImage
+ * Download https://github.com/uav4geo/Thermal-Tools/releases/download/v1.2.0/Thermal_Tools.AppImage
  * Run: `chmod +x ./Thermal_Tools.AppImage && ./Thermal_Tools.AppImage`
 
 Afterwards:
