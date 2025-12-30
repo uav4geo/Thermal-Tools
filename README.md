@@ -32,6 +32,8 @@ Afterwards:
  * Zenmuse H30 Series
  * Mavic 2 Enterprise Advanced
  * DJI Mavic 3 Enterprise
+ * DJI Matrice 4 Series
+
 
 ## Supported Platforms
 
