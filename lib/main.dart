@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:collection';
+import 'package:args/args.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
@@ -12,12 +13,40 @@ import 'tiff_encoder.dart';
 import 'input_slider/input_slider.dart';
 import 'input_slider/input_slider_form.dart';
 
-void main() {
-  runApp(const MyApp());
+void main(List<String> args) {
+  final parser = ArgParser();
+
+  parser.addOption('input',
+    help: 'Input folder for batch processing. Default: ""',
+    defaultsTo: '');
+  parser.addOption('distance',
+    help: 'Distance (m). Default: 5',
+    defaultsTo: '5');
+  parser.addOption('humidity',
+    help: 'Humidity (%). Default: 70',
+    defaultsTo: '70');
+  parser.addOption('emissivity',
+    help: 'Emissivity. Default: 1.0',
+    defaultsTo: '1.0');
+  parser.addOption('ambient-temperature',
+    help: 'Ambient Temperature (degrees C). Default: 25.0',
+    defaultsTo: '25.0');
+  parser.addOption('reflected-temperature',
+    help: 'Reflected Temperature (degrees C). Default: 23.0',
+    defaultsTo: '23.0');
+
+  try{
+    final params = parser.parse(args);
+    runApp(MyApp(params));
+  } on FormatException catch (e) {
+    print(parser.usage);
+    exit(1);
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ArgResults params;
+  MyApp(this.params, {super.key});
 
   // This widget is the root of your application.
   @override
@@ -28,15 +57,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.highContrastLight(),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'Thermal Tools by UAV4GEO'),
+      home: HomePage(title: 'Thermal Tools by UAV4GEO', params: params),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  HomePage({super.key, required this.title, required this.params});
 
   final String title;
+  final ArgResults params;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -50,12 +80,44 @@ class _HomePageState extends State<HomePage> {
   int _processedFiles = 0;
   int _failedFiles = 0;
   String _lastError = "";
+  bool _batchProcess = false;
   bool _overrideEnvParams = false;
   double _paramDistance = 5.0; // meters
   double _paramHumidity = 70.0; // %
   double _paramEmissivity = 1.0; // factor
   double _paramAmbient = 25.0; // Celsius
   double _paramReflection = 23.0; // Celsius
+
+  @override
+  void initState() {
+    super.initState();
+    
+    final batchInput = this.widget.params["input"];
+    if (batchInput.isNotEmpty) {
+      if (Directory(batchInput).existsSync()){
+        _batchProcess = true;
+        _overrideEnvParams = true;
+
+        _paramDistance = double.tryParse(this.widget.params["distance"]) ?? 5.0;
+        _paramHumidity = double.tryParse(this.widget.params["humidity"]) ?? 70.0;
+        _paramEmissivity = double.tryParse(this.widget.params["emissivity"]) ?? 1.0;
+        _paramAmbient = double.tryParse(this.widget.params["ambient-temperature"]) ?? 25.0;
+        _paramReflection = double.tryParse(this.widget.params["reflected-temperature"]) ?? 23.0;
+
+        _setSelectedFilesAndFolder(batchInput);
+        if (_selectedFiles.length > 0){
+          _convertFiles(context);
+          exit(_processedFiles > 0 ? 0 : 1);
+        }else{
+          print("No files found in $batchInput");
+          exit(1)
+        }
+      }else{
+        print('Error: Input directory $batchInput does not exist');
+        exit(1);
+      }
+    }
+  }
 
   Future<void> _selectFolder(BuildContext context) async {
     String? path = await FilePicker.platform
@@ -203,6 +265,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _convertFile(Directory outDir, FileSystemEntity f) async {
     String outFile =
         p.join(outDir.path, "${p.basenameWithoutExtension(f.path)}.tif");
+    print("Processing ${p.basename(f.path)}");
+
     if (_processing) {
       String outFileRaw = "";
       int width = 640;
@@ -216,6 +280,7 @@ class _HomePageState extends State<HomePage> {
           _failedFiles++;
           _lastError = e.toString();
         });
+        print("Failed to process ${p.basename(f.path)}: ${e.toString()}");
       } finally {
         if (outFileRaw != "") {
           File f = File(outFileRaw);
