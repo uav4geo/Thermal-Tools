@@ -23,14 +23,15 @@ Afterwards:
 
 :warning: When processing the resulting images with WebODM, make sure you **don't** select the *radiometric-calibration* option. The images processed with this software are already calibrated. 
 
-## Batch / Command Line Mode
+## Batch Processing
 
-The application can be invoked from the command line for processing batch images:
+The application can be invoked from the command line for processing images in scripts:
 
 ```bash
 ./Thermal_Tools.AppImage [args]
 
 --input                    Input folder for batch processing. Default: ""
+--output                   Output folder for batch processing. Default: "converted"
 --distance                 Distance (m). Default: 5
 --humidity                 Humidity (%). Default: 70
 --emissivity               Emissivity. Default: 1.0
