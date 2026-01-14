@@ -23,6 +23,21 @@ Afterwards:
 
 :warning: When processing the resulting images with WebODM, make sure you **don't** select the *radiometric-calibration* option. The images processed with this software are already calibrated. 
 
+## Batch / Command Line Mode
+
+The application can be invoked from the command line for processing batch images:
+
+```bash
+./Thermal_Tools.AppImage [args]
+
+--input                    Input folder for batch processing. Default: ""
+--distance                 Distance (m). Default: 5
+--humidity                 Humidity (%). Default: 70
+--emissivity               Emissivity. Default: 1.0
+--ambient-temperature      Ambient Temperature (degrees C). Default: 25.0
+--reflected-temperature    Reflected Temperature (degrees C). Default: 23.0
+```
+
 ## Supported Drones
 
  * Zenmuse H20N

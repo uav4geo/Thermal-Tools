@@ -17,22 +17,25 @@ void main(List<String> args) {
   final parser = ArgParser();
 
   parser.addOption('input',
-    help: 'Input folder for batch processing. Default: ""',
+    help: 'Input folder for batch processing',
     defaultsTo: '');
+  parser.addOption('output',
+    help: 'Output folder for batch processing',
+    defaultsTo: 'converted');
   parser.addOption('distance',
-    help: 'Distance (m). Default: 5',
+    help: 'Distance (m)',
     defaultsTo: '5');
   parser.addOption('humidity',
-    help: 'Humidity (%). Default: 70',
+    help: 'Humidity (%)',
     defaultsTo: '70');
   parser.addOption('emissivity',
-    help: 'Emissivity. Default: 1.0',
+    help: 'Emissivity',
     defaultsTo: '1.0');
   parser.addOption('ambient-temperature',
-    help: 'Ambient Temperature (degrees C). Default: 25.0',
+    help: 'Ambient Temperature (degrees C)',
     defaultsTo: '25.0');
   parser.addOption('reflected-temperature',
-    help: 'Reflected Temperature (degrees C). Default: 23.0',
+    help: 'Reflected Temperature (degrees C)',
     defaultsTo: '23.0');
 
   try{
@@ -107,10 +110,9 @@ class _HomePageState extends State<HomePage> {
         _setSelectedFilesAndFolder(batchInput);
         if (_selectedFiles.length > 0){
           _convertFiles(context);
-          exit(_processedFiles > 0 ? 0 : 1);
         }else{
           print("No files found in $batchInput");
-          exit(1)
+          exit(1);
         }
       }else{
         print('Error: Input directory $batchInput does not exist');
@@ -146,6 +148,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getOutputFolder() {
+    if (widget.params["output"].isNotEmpty && widget.params["output"] != "converted"){
+      return widget.params["output"];
+    }
     if (_selectedFolder == "") throw "Folder not selected";
     return p.join(_selectedFolder, "converted");
   }
@@ -340,6 +345,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _processing = false;
     });
+
+    if (_batchProcess){
+      exit(_processedFiles > 0 ? 0 : 1);
+    }
   }
 
   Future<void> _cancelProcessing(BuildContext context) async {
