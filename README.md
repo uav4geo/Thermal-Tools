@@ -41,7 +41,7 @@ The application can be invoked from the command line for processing images in sc
 
 ## Remote API
 
-You can also process thermal images remotely via a web API with [NodeThermalTools](https://github.com/uav4geo.com/NodeThermalTools).
+You can also process thermal images remotely via a web API with [NodeThermalTools](https://github.com/uav4geo/NodeThermalTools).
 
 ## Supported Drones
 
