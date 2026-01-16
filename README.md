@@ -39,6 +39,10 @@ The application can be invoked from the command line for processing images in sc
 --reflected-temperature    Reflected Temperature (degrees C). Default: 23.0
 ```
 
+## Remote API
+
+You can also process thermal images remotely via a web API with [NodeThermalTools](https://github.com/uav4geo.com/NodeThermalTools).
+
 ## Supported Drones
 
  * Zenmuse H20N
